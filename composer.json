@@ -1,0 +1,26 @@
+{
+    "name": "yuanchang/laravel-xcms",
+    "description": "laravel cms",
+    "license": "MIT",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "yuanchang",
+            "email": "yuanchang.xu@outlook.com"
+        }
+    ],
+    "require": {
+    	"php": ">=5.6.4",
+        "watson/validating": "^3.0",
+        "intervention/image": "^2.3",
+        "baum/baum": "^1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Admin\\":"admin/src",
+            "XCms\\":"cms/src",
+            "Flash\\":"flash/src",
+            "Upload\\": "packages/xcms/fileUpload/src"
+        }
+    }
+}
