@@ -134,9 +134,10 @@ class BlockController extends BaseController
                 ]
             ];
         }
-        $image = Admin::FileInput($this->img,function($fileInput) use ($imagePreview,$imagePreviewConfig) {
-            return $fileInput->preview($imagePreview,$imagePreviewConfig)->render();
-        }
+        $image = Admin::FileInput($this->img,
+            function($fileInput) use ($imagePreview,$imagePreviewConfig) {
+                return $fileInput->preview($imagePreview,$imagePreviewConfig)->render();
+            }
         );
         return view('block::block.edit',compact('block','categories','image'));
     }
