@@ -67,8 +67,8 @@ class BlockController extends BaseController
     {
         // image render
         $image = Admin::FileInput($this->img, function($fileInput){
-                return $fileInput->render();
-            }
+            return $fileInput->render();
+        }
         );
         //categories
         $categories = BlockCategory::all();
@@ -121,22 +121,22 @@ class BlockController extends BaseController
             Flash::warning('该block不存在');
             return redirect( route('blocks.index') );
         }
-        $config = config('fileupload.image');
+        $config = config('xcms');
         // image render
         $imagePreview = [];
         $imagePreviewConfig = [];
         if ($block->image) {
-            $imagePreview = [ $config['url'].$block->image ];
+            $imagePreview = [ $config['img']['url'].$block->image ];
             $imagePreviewConfig  = [
                 [
-                'url'=>'/admin/block/delete/'.$block->id.'/image',
-                'extra'=>['path'=>$block->image,'_token'=>csrf_token()]
+                    'url'=>'/admin/block/delete/'.$block->id.'/image',
+                    'extra'=>['path'=>$block->image,'_token'=>csrf_token()]
                 ]
             ];
         }
         $image = Admin::FileInput($this->img,function($fileInput) use ($imagePreview,$imagePreviewConfig) {
-                return $fileInput->preview($imagePreview,$imagePreviewConfig)->render();
-            }
+            return $fileInput->preview($imagePreview,$imagePreviewConfig)->render();
+        }
         );
         return view('block::block.edit',compact('block','categories','image'));
     }
@@ -161,7 +161,7 @@ class BlockController extends BaseController
             if (empty($inputs['image'])) {
                 $inputs['image'] = $block->image;
             }
-            $block->fill($request->all())->saveOrFail();
+            $block->fill($inputs)->saveOrFail();
             Flash::success("保存成功");
         } catch (ValidationException $validationException) {
             return redirect()->back()->withErrors($validationException->getErrors());
@@ -208,13 +208,13 @@ class BlockController extends BaseController
     {
         try {
             $path = (new Upload(
-                        new Image($request->file('image'))
-                    )
-                )->save()->path;
+                new Image($request->file('image'))
+            )
+            )->save()->path;
         } catch (FileUploadException $fileUploadException) {
             return response()->json([
-                'success'=>false,
-                'message'=>$fileUploadException->getMessage()
+                    'success'=>false,
+                    'message'=>$fileUploadException->getMessage()
                 ]
             );
         }
