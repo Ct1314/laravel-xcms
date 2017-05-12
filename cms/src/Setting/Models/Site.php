@@ -19,6 +19,5 @@ class Site extends Model
         'icp'=>'required',
         'copyright'=>'required',
         'status'=>'required',
-        'copyright'=>'required'
     ];
 }

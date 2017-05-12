@@ -57,5 +57,4 @@ class BaseController extends Controller
             'message'=>'删除成功'
         ];
     }
-
 }

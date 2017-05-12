@@ -16,6 +16,7 @@ use XCms\Traits\DeleteResource;
 use XCms\Article\Models\Module;
 use XCms\Article\Models\Article;
 use XCms\Article\Models\Category;
+use Illuminate\Support\Facades\File;
 use Watson\Validating\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -23,6 +24,9 @@ class ArticleController extends BaseController
 {
     use DeleteResource;
 
+    /**
+     * @var array
+     */
     protected $thumb = [
         'id'=>'thumb',
         'hidden'=>'thumb',
@@ -33,6 +37,9 @@ class ArticleController extends BaseController
         'uploadUrl'=>'/admin/article/upload/thumb',
     ];
 
+    /**
+     * @var array
+     */
     protected $video = [
         'id'=>'video',
         'hidden'=>'video',
@@ -47,6 +54,16 @@ class ArticleController extends BaseController
         'purifyHtml'=>true,
     ];
 
+    /**
+     * @name index
+     * @desc
+     * @author Yuanchang.xu
+     * @version
+     * @see
+     * @since 2017.05.
+     * @return mixed
+     * @exception
+     */
     public function index()
     {
         $arts = Article::orderBy('order','desc')->paginate(10);
@@ -54,6 +71,16 @@ class ArticleController extends BaseController
     }
 
 
+    /**
+     * @name create
+     * @desc
+     * @author Yuanchang.xu
+     * @version
+     * @see
+     * @since 2017.05.
+     * @return mixed
+     * @exception
+     */
     public function create()
     {
         // render thumb fileinput
@@ -161,6 +188,18 @@ class ArticleController extends BaseController
         return view('article::article.edit',compact('art','categories','modules','thumb','video'));
     }
 
+    /**
+     * @name update
+     * @desc
+     * @author Yuanchang.xu
+     * @version
+     * @see
+     * @since 2017.05.
+     * @param $id
+     * @param Request $request
+     * @return mixed
+     * @exception
+     */
     public function update($id,Request $request)
     {
         $inputs = $request->all();
@@ -195,12 +234,14 @@ class ArticleController extends BaseController
      */
     public function destroy($id)
     {
+        $config = config('xcms');
+
         try {
             $art =  Article::findOrFail($id);
             $art->delete();
-            $this->delete('image',$art->thumb);
-            $this->delete('video',$art->video);
-            $this->html($id);
+            File::delete(public_path($config['img']['url']).'/'.$art->thumb);
+            File::delete(public_path($config['video']['url']).'/'.$art->video);
+            File::delete($config['html']['root'].$config['html']['prefix'].$id.$config['html']['ext']);
             Flash::success('删除成功');
         } catch (ModelNotFoundException $e) {
             Flash::warning('该文章不存在');
@@ -234,12 +275,22 @@ class ArticleController extends BaseController
         ]);
     }
 
+    /**
+     * @name uploadThumb
+     * @desc
+     * @author Yuanchang.xu
+     * @version
+     * @see
+     * @since 2017.05.
+     * @param Request $request
+     * @return mixed
+     * @exception
+     */
     public function uploadThumb(Request $request)
     {
         try {
             $upload = new Upload(new Image($request->file('file')));
             $upload->save();
-            $path = $upload->path;
         } catch (FileUploadException $fileUploadException) {
             return response()->json([
                     'success'=>false,
@@ -253,6 +304,18 @@ class ArticleController extends BaseController
         ];
     }
 
+    /**
+     * @name deleteVideo
+     * @desc
+     * @author Yuanchang.xu
+     * @version
+     * @see
+     * @since 2017.05.
+     * @param Request $request
+     * @param $id
+     * @return mixed
+     * @exception
+     */
     public function deleteVideo(Request $request,$id)
     {
         $path = $request->get('path');
@@ -273,6 +336,18 @@ class ArticleController extends BaseController
         ];
     }
 
+    /**
+     * @name deleteThumb
+     * @desc
+     * @author Yuanchang.xu
+     * @version
+     * @see
+     * @since 2017.05.
+     * @param Request $request
+     * @param $id
+     * @return mixed
+     * @exception
+     */
     public function deleteThumb(Request $request,$id)
     {
         $path = $request->get('path');
@@ -304,7 +379,6 @@ class ArticleController extends BaseController
     public function getBody($id)
     {
         $article = Article::find($id,['body','title']);
-
         if(!$article) {
             return response()->json([
                 'success'=>false,
@@ -319,7 +393,4 @@ class ArticleController extends BaseController
             'title'=>$article->title,
         ]);
     }
-
-
-
 }

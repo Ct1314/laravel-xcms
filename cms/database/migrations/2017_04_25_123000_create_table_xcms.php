@@ -111,6 +111,15 @@ class CreateTableXCms extends Migration
             $table->longText('body')->nullable()->comment('内容');
             $table->timestamps();
         });
+
+        Schema::create('contacts',function (Blueprint $table) {
+            $table->tinyInteger('id',1)->comment('id');
+            $table->string('icp')->comment('icp备案号');
+            $table->string('copyright')->comment('版权信息');
+            $table->boolean('status')->comment('状态-1 0-关闭 1-正常');
+            $table->string('close_cause')->comment('关闭原因');
+            $table->timestamps();
+        });
     }
 
     /**
